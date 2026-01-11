@@ -17,7 +17,23 @@ export const createNote = async (req, res) => {
 }
 
 export const getNotes = async (req, res) => {
-    const notes = await Note.find({ user: req.user.id }).populate("user", "name email")
+    const { search = "", sort = "latest" } = req.query
+    
+    const query = {
+        user: req.user.id
+    }
+
+    if (search) {
+        query.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { content: { $regex: search, $options: "i" } }
+        ]
+    }
+
+    const sortOption = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 }
+
+    const notes = await Note.find(query).sort(sortOption).populate("user", "name email")
+
     res.json(notes)
 }
 
