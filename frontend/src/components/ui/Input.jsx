@@ -1,11 +1,15 @@
 const Input = ({ label, formik, name, className, ...props }) => {
-    const error = formik.touched[name] && formik.errors[name]
+    const hasFormik = !!(formik && name)
+
+    const error = hasFormik && formik.touched?.[name] && formik.errors?.[name]
+
+    const fieldProps = hasFormik ? formik.getFieldProps(name) : {}
 
     return (
         <div className="space-y-1">
             {label && <label className="text-sm font-medium">{label}</label>}
             {props.type === "textarea" && <textarea
-                {...formik.getFieldProps(name)}
+                {...fieldProps}
                 {...props}
                 rows={10}
                 className={`resize-none w-full px-3 py-2 border rounded-md focus:outline-none
@@ -13,7 +17,7 @@ const Input = ({ label, formik, name, className, ...props }) => {
                 ${className || ""}`}
             />}
             {props.type !== "textarea" && <input
-                {...formik.getFieldProps(name)}
+                {...fieldProps}
                 {...props}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none
                 ${error ? "border-red-500" : "border-gray-300"}
